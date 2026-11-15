@@ -2,11 +2,7 @@
 //! Made for Hack Club (https://hackclub.com)
 
 use percent_encoding::percent_decode_str;
-use std::{
-    error, fmt,
-    fs::{self, File},
-    io, process,
-};
+use std::{error, fmt, fs, io, process};
 mod theme;
 use clap::Parser;
 use indicatif::{ProgressBar, ProgressStyle};
@@ -141,7 +137,7 @@ fn main() -> Result<(), Box<dyn error::Error>> {
     print_if(
         !args.quiet,
         format!(
-            "\n{mauve}\x1b[1mYES!{reset} Saved {blue}{url}{reset} as {yellow}{name}{reset}, ({dim}{}{reset})",
+            "\n{reset}{mauve}\x1b[1mYES!{reset} Saved {blue}{url}{reset} as {yellow}{name}{reset}, ({dim}{}{reset})",
             bytes
         ),
     );
