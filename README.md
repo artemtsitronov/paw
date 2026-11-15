@@ -5,6 +5,6 @@ Built for [Hack Club](https://hackclub.com).
 
 ## Usage
 ```bash
-cargo install paw
+cargo install --git https://github.com/artemtsitronov/paw
 paw <url>
 ```
