@@ -1,4 +1,4 @@
-// Expelliarmus! Sectusempra! PRETTIFY!
+// Expelliarmus! Sectusempra! PRETTIFY! (hp reference)
 
 use std::{
     env,
@@ -13,6 +13,10 @@ pub struct Theme {
     pub mauve: &'static str,
     pub dim: &'static str,
     pub reset: &'static str,
+    pub frame: &'static str,
+    pub chip_ok: &'static str,
+    pub chip_err: &'static str,
+    pub chip_dim: &'static str,
 }
 
 impl Default for Theme {
@@ -25,6 +29,10 @@ impl Default for Theme {
             mauve: "\x1b[38;2;203;166;247m",
             dim: "\x1b[38;2;166;173;200m",
             reset: "\x1b[0m",
+            frame: "\x1b[38;2;88;91;112m",
+            chip_ok: "\x1b[48;2;166;227;161m\x1b[38;2;30;30;46m",
+            chip_err: "\x1b[48;2;243;139;168m\x1b[38;2;30;30;46m",
+            chip_dim: "\x1b[48;2;69;71;90m\x1b[38;2;205;214;244m",
         }
     }
 }
@@ -41,6 +49,10 @@ pub fn get_theme() -> Theme {
             mauve: "",
             dim: "",
             reset: "",
+            frame: "",
+            chip_ok: "",
+            chip_err: "",
+            chip_dim: "",
         }
     }
 }

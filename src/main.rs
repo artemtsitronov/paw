@@ -1,5 +1,5 @@
 use percent_encoding::percent_decode_str;
-use std::{env, error, fs::File, io, process};
+use std::{env, error, fmt, fs::File, io, process};
 mod theme;
 use indicatif::{ProgressBar, ProgressStyle};
 use theme::{Theme, get_theme};
@@ -15,7 +15,7 @@ fn hooman(bytes: u64) -> String {
     if i == 0 {
         format!("{bytes} B")
     } else {
-        format!("{v:.1}, {}", UNITS[i])
+        format!("{v:.1} {}", UNITS[i])
     }
 }
 
@@ -32,6 +32,10 @@ fn get_fname(raw: &str) -> Result<String, Box<dyn error::Error>> {
     Ok(name)
 }
 
+fn chip(style: &str, reset: &str, text: impl fmt::Display) -> String {
+    format!("{style} {text} {reset}")
+}
+
 fn main() -> Result<(), Box<dyn error::Error>> {
     let url = env::args().nth(1).expect("OH NO! Usage: paw <url>");
     let name = get_fname(&url)?;
@@ -44,6 +48,10 @@ fn main() -> Result<(), Box<dyn error::Error>> {
         mauve,
         dim,
         reset,
+        frame,
+        chip_ok,
+        chip_err,
+        chip_dim,
     } = get_theme();
 
     println!(
@@ -66,7 +74,7 @@ fn main() -> Result<(), Box<dyn error::Error>> {
     let mime = response.body().mime_type();
 
     println!(
-        "{green}{}{reset} - {blue}{}{reset} {}",
+        "{chip_ok} {} {reset} - {chip_dim} {} {reset} {dim} {} {reset}",
         response.status(),
         size.map(hooman).unwrap_or("UNKNOWN".into()),
         mime.unwrap_or("UNKNOWN")
@@ -87,7 +95,7 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 
     pb.finish_and_clear();
     println!(
-        "{mauve}YES!{reset} Saved {blue}{url}{reset} as {green}{name}{reset}, ({dim}{}{reset})",
+        "\n{mauve}\x1b[1mYES!{reset} Saved {blue}{url}{reset} as {yellow}{name}{reset}, ({dim}{}{reset})",
         bytes
     );
 
