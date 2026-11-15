@@ -5,6 +5,7 @@ use std::{
     io::{self, IsTerminal},
 };
 
+#[allow(dead_code)]
 pub struct Theme {
     pub green: &'static str,
     pub red: &'static str,

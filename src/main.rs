@@ -1,3 +1,6 @@
+//! Paw is a simple URL fetcher, written by Artem Tsitronov.
+//! Made for Hack Club (https://hackclub.com)
+
 use percent_encoding::percent_decode_str;
 use std::{error, fmt, fs::File, io, process};
 mod theme;
@@ -5,9 +8,6 @@ use clap::Parser;
 use indicatif::{ProgressBar, ProgressStyle};
 use theme::{Theme, get_theme};
 use url::Url;
-
-/// Paw is a simple URL fetcher, written by Artem Tsitronov.
-/// Made for Hack Club (https://hackclub.com)
 
 fn print_if(condition: bool, text: impl fmt::Display) {
     if condition {
@@ -34,7 +34,7 @@ fn get_fname(raw: &str) -> Result<String, Box<dyn error::Error>> {
 
     let name = parsed
         .path_segments()
-        .and_then(|segs| segs.last())
+        .and_then(|mut segs| segs.next_back())
         .filter(|s| !s.is_empty())
         .map(|s| percent_decode_str(s).decode_utf8_lossy().into_owned())
         .unwrap_or_else(|| "paw_download".to_string());
@@ -77,7 +77,7 @@ fn main() -> Result<(), Box<dyn error::Error>> {
         !args.quiet,
         format!(
             "{dim}~{reset} Started downloading {blue}{} {dim}~{reset}",
-            &url
+            url
         ),
     );
 
