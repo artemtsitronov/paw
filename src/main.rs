@@ -1,6 +1,7 @@
 use percent_encoding::percent_decode_str;
 use std::{env, error, fs::File, io, process};
 mod theme;
+use indicatif::{ProgressBar, ProgressStyle};
 use theme::{Theme, get_theme};
 use url::Url;
 
@@ -71,10 +72,24 @@ fn main() -> Result<(), Box<dyn error::Error>> {
         mime.unwrap_or("UNKNOWN")
     );
 
-    let mut file = File::create(&name)?;
-    let bytes = io::copy(&mut response.body_mut().as_reader(), &mut file);
+    let pb = match size {
+        Some(t) => ProgressBar::new(t),
+        None => ProgressBar::new_spinner(),
+    };
+    pb.set_style(ProgressStyle::with_template("{msg}  {bar:24.183/240}  {percent:>3}%  {bytes}/{total_bytes}  {bytes_per_sec}  eta {eta}")?.progress_chars("━╸━"));
+    pb.set_message(name.clone());
 
-    println!("saved {url} as {name}, bytes: {:?}", bytes);
+    let mut file = File::create(&name)?;
+    let bytes = io::copy(
+        &mut pb.wrap_read(response.body_mut().as_reader()),
+        &mut file,
+    )?;
+
+    pb.finish_and_clear();
+    println!(
+        "{mauve}YES!{reset} Saved {blue}{url}{reset} as {green}{name}{reset}, ({dim}{}{reset})",
+        bytes
+    );
 
     Ok(())
 }
