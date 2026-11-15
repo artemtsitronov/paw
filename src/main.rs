@@ -2,7 +2,11 @@
 //! Made for Hack Club (https://hackclub.com)
 
 use percent_encoding::percent_decode_str;
-use std::{error, fmt, fs::File, io, process};
+use std::{
+    error, fmt,
+    fs::{self, File},
+    io, process,
+};
 mod theme;
 use clap::Parser;
 use indicatif::{ProgressBar, ProgressStyle};
@@ -105,14 +109,29 @@ fn main() -> Result<(), Box<dyn error::Error>> {
         ),
     );
 
-    let pb = match size {
-        Some(t) => ProgressBar::new(t),
-        None => ProgressBar::new_spinner(),
+    let pb = if args.quiet {
+        ProgressBar::hidden()
+    } else {
+        match size {
+            Some(t) => ProgressBar::new(t),
+            None => ProgressBar::new_spinner(),
+        }
     };
     pb.set_style(ProgressStyle::with_template("{msg}  {bar:24.183/240}  {percent:>3}%  {bytes}/{total_bytes}  {bytes_per_sec}  eta {eta}")?.progress_chars("━╸━"));
     pb.set_message(name.clone());
 
-    let mut file = File::create(&name)?;
+    let mut file = match fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&name)
+    {
+        Ok(f) => f,
+        Err(e) if e.kind() == io::ErrorKind::AlreadyExists => {
+            eprintln!("{chip_err} ERROR {reset} - {name} already exists");
+            process::exit(1);
+        }
+        Err(e) => return Err(e.into()),
+    };
     let bytes = io::copy(
         &mut pb.wrap_read(response.body_mut().as_reader()),
         &mut file,
